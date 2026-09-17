@@ -1,0 +1,20 @@
+[
+  {
+    "name": "ottoman-constantinople-year",
+    "question": "In what year did Mehmed the Conqueror conquer Constantinople?",
+    "top_k": 3,
+    "document_id": 26
+  },
+  {
+    "name": "ottoman-byzantine-end",
+    "question": "Which empire ended when Constantinople was conquered by Mehmed the Conqueror?",
+    "top_k": 3,
+    "document_id": 26
+  },
+  {
+    "name": "ottoman-orthodox-church",
+    "question": "What did Mehmed allow the Eastern Orthodox Church to keep after conquering Constantinople?",
+    "top_k": 3,
+    "document_id": 26
+  }
+]

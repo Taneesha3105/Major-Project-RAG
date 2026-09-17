@@ -1,0 +1,32 @@
+[
+  {
+    "name": "broad-search-project-overview",
+    "question": "What technologies are used in this RAG chatbot project?",
+    "top_k": 3
+  },
+  {
+    "name": "broad-search-chat-flow",
+    "question": "How does the chat flow work from retrieval to final answer?",
+    "top_k": 5
+  },
+  {
+    "name": "broad-search-retrieval-flow",
+    "question": "What is the retrieval flow in this system?",
+    "top_k": 3
+  },
+  {
+    "name": "documents-endpoint-behavior",
+    "question": "What document management actions does the backend support?",
+    "top_k": 3
+  },
+  {
+    "name": "embedding-pipeline-summary",
+    "question": "How are embeddings generated and stored in this project?",
+    "top_k": 3
+  },
+  {
+    "name": "streaming-chat-flow",
+    "question": "How does streaming chat work in this application?",
+    "top_k": 3
+  }
+]

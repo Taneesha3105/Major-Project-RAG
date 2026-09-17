@@ -1,0 +1,50 @@
+[
+  {
+    "name": "eligibility-membership",
+    "question": "Who is eligible for membership in this plan?",
+    "top_k": 3,
+    "document_id": 23
+  },
+  {
+    "name": "service-area-counties",
+    "question": "What counties are included in the service area?",
+    "top_k": 3,
+    "document_id": 23
+  },
+  {
+    "name": "member-card-usage",
+    "question": "Should a member use the Medicare card or the UnitedHealthcare UCard for covered services?",
+    "top_k": 3,
+    "document_id": 23
+  },
+  {
+    "name": "provider-leaves-network",
+    "question": "What should a member do if their doctor or specialist leaves the network?",
+    "top_k": 3,
+    "document_id": 23
+  },
+  {
+    "name": "referral-network-specialist",
+    "question": "Does a member need a referral to see a network specialist?",
+    "top_k": 3,
+    "document_id": 23
+  },
+  {
+    "name": "out-of-network-care",
+    "question": "Can members get care from out-of-network providers?",
+    "top_k": 3,
+    "document_id": 23
+  },
+  {
+    "name": "move-out-of-service-area",
+    "question": "What happens if a member moves out of the plan's service area?",
+    "top_k": 3,
+    "document_id": 23
+  },
+  {
+    "name": "monthly-premium-2026",
+    "question": "What is the monthly premium for this plan in 2026?",
+    "top_k": 3,
+    "document_id": 23
+  }
+]

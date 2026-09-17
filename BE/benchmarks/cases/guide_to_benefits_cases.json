@@ -1,0 +1,26 @@
+[
+  {
+    "name": "benefits-auto-rental-limit",
+    "question": "What is the maximum reimbursement amount for auto rental coverage?",
+    "top_k": 3,
+    "document_id": 24
+  },
+  {
+    "name": "benefits-baggage-delay-threshold",
+    "question": "How long must checked baggage be delayed before baggage delay insurance applies?",
+    "top_k": 3,
+    "document_id": 24
+  },
+  {
+    "name": "benefits-return-protection-limit",
+    "question": "What is the reimbursement limit for return protection?",
+    "top_k": 3,
+    "document_id": 24
+  },
+  {
+    "name": "benefits-trip-delay-limit",
+    "question": "What is the maximum benefit for trip delay reimbursement?",
+    "top_k": 3,
+    "document_id": 24
+  }
+]
