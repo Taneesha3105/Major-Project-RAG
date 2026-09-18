@@ -1,4 +1,5 @@
 RAG Chatbot
+
 A low-latency, document-grounded chatbot using RAG, PostgreSQL + pgvector, local ONNX embeddings, FlashRank and Gemini.
 
 Tech Stack
