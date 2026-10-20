@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>RAG Chatbot</title>
+  <defs>
+    <linearGradient id="bg" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d18463" />
+      <stop offset="1" stop-color="#5b9ba4" />
+    </linearGradient>
+    <linearGradient id="bubble" x1="16" y1="16" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff8f2" />
+      <stop offset="1" stop-color="#f4efe6" />
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="52" height="52" rx="16" fill="url(#bg)" />
+  <path
+    d="M20 22c0-3.314 2.686-6 6-6h12c3.314 0 6 2.686 6 6v8c0 3.314-2.686 6-6 6H31.5l-6.8 6.1c-.98.88-2.53.184-2.53-1.133V36.5A5.99 5.99 0 0 1 20 31V22Z"
+    fill="url(#bubble)"
+  />
+  <circle cx="28" cy="27" r="2.2" fill="#b9542c" />
+  <circle cx="35" cy="27" r="2.2" fill="#b9542c" />
+  <circle cx="42" cy="27" r="2.2" fill="#b9542c" />
+  <path
+    d="M47.4 14.2l1.2 3.4 3.4 1.2-3.4 1.2-1.2 3.4-1.2-3.4-3.4-1.2 3.4-1.2 1.2-3.4Z"
+    fill="#fff8f2"
+  />
+</svg>

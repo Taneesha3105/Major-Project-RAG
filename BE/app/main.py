@@ -1,109 +1,81 @@
+"""FastAPI application factory and lifespan (job workers, model warm-up)."""
+
 import asyncio
 import logging
-from contextlib import asynccontextmanager, suppress
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import ORJSONResponse
+from fastapi.middleware.gzip import GZipMiddleware
+from sqlalchemy import text
 
-from app.api.router import api_router
-from app.chat.reranker import build_chat_reranker
+from app.ai import embeddings, reranker
+from app.controllers import api_router
 from app.core.config import settings
-from app.core.error_handlers import register_exception_handlers
+from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging
-from app.core.middleware import register_request_middleware
-from app.core.readiness import readiness_state
-from app.db.init_db import close_database_engine, initialize_database
-from app.embeddings.provider import warm_configured_embedding_provider
+from app.db.session import engine
+from app.services.document_service import resume_pending_documents
+from app.services.job_queue import analysis_queue, ingestion_queue
 
-configure_logging(settings.log_level)
+configure_logging()
 logger = logging.getLogger(__name__)
 
 
-def _log_warmup_task_result(task: asyncio.Task[None]) -> None:
+async def _warm_models() -> None:
     try:
-        task.result()
-    except asyncio.CancelledError:
-        logger.info("Local embedding warmup task was cancelled during shutdown.")
-    except Exception:
-        logger.exception("Local embedding warmup failed.")
+        await asyncio.to_thread(embeddings.warmup)
+        await asyncio.to_thread(reranker.warmup)
+        logger.info("Embedding and reranker models are ready.")
+    except Exception:  # noqa: BLE001 - models also load lazily on first use
+        logger.exception("Model warm-up failed")
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-    logger.info("Starting %s in %s mode", settings.app_name, settings.app_env)
-    readiness_state.begin_startup(
-        requires_local_embedding=settings.embedding_provider == "local" and settings.local_embedding_warmup_enabled,
-        embedding_runtime=settings.local_embedding_runtime if settings.embedding_provider == "local" else None,
-    )
-    await initialize_database()
-    readiness_state.mark_database_ready()
-    app.state.chat_reranker = build_chat_reranker(
-        enabled=settings.flashrank_enabled,
-        model_name=settings.flashrank_model,
-    )
-    if settings.flashrank_enabled and settings.flashrank_warmup_enabled:
-        try:
-            await app.state.chat_reranker.warmup()
-        except Exception:
-            logger.exception("FlashRank warmup failed. The backend will continue and fall back to fast mode if needed.")
-    warmup_task: asyncio.Task[None] | None = None
-    if settings.embedding_provider == "local" and settings.local_embedding_warmup_enabled:
-        if settings.local_embedding_warmup_mode == "blocking":
-            readiness_state.mark_embedding_warming(runtime=settings.local_embedding_runtime)
-            try:
-                await warm_configured_embedding_provider()
-            except Exception as exc:
-                readiness_state.mark_embedding_failed(str(exc), runtime=settings.local_embedding_runtime)
-                raise
-            readiness_state.mark_embedding_ready(runtime=settings.local_embedding_runtime)
-        else:
-            readiness_state.mark_embedding_warming(runtime=settings.local_embedding_runtime)
-
-            async def background_warmup() -> None:
-                try:
-                    await warm_configured_embedding_provider()
-                except Exception as exc:
-                    readiness_state.mark_embedding_failed(str(exc), runtime=settings.local_embedding_runtime)
-                    raise
-                readiness_state.mark_embedding_ready(runtime=settings.local_embedding_runtime)
-
-            warmup_task = asyncio.create_task(background_warmup())
-            warmup_task.add_done_callback(_log_warmup_task_result)
-    else:
-        readiness_state.mark_embedding_skipped()
+async def lifespan(_: FastAPI):
+    settings.storage_path.mkdir(parents=True, exist_ok=True)
+    async with engine.connect() as connection:
+        await connection.execute(text("SELECT 1"))
+    ingestion_queue.start()
+    analysis_queue.start()
+    resumed = await resume_pending_documents()
+    if resumed:
+        logger.info("Re-queued %s unfinished document(s).", resumed)
+    warmup_task = asyncio.create_task(_warm_models())
+    if not settings.llm_configured:
+        logger.warning("GEMINI_API_KEY is not set: chat and AI analysis are disabled.")
     yield
-    if warmup_task is not None and not warmup_task.done():
-        warmup_task.cancel()
-        with suppress(asyncio.CancelledError):
-            await warmup_task
-    readiness_state.mark_database_not_ready()
-    await close_database_engine()
-    logger.info("Shutting down %s", settings.app_name)
+    warmup_task.cancel()
+    await ingestion_queue.stop()
+    await analysis_queue.stop()
+    await engine.dispose()
 
 
-def create_application() -> FastAPI:
+def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.app_name,
         version=settings.app_version,
+        description="AI-assisted M&A due diligence: virtual data room, evidence-backed Q&A, risk register and checklist.",
         lifespan=lifespan,
-        default_response_class=ORJSONResponse,
+        docs_url="/docs",
         openapi_url=f"{settings.api_v1_prefix}/openapi.json",
-        docs_url=f"{settings.api_v1_prefix}/docs",
-        redoc_url=f"{settings.api_v1_prefix}/redoc",
     )
-    app.state.chat_reranker = None
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.cors_origins_list,
+        allow_origins=settings.cors_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    register_request_middleware(app)
+    app.add_middleware(GZipMiddleware, minimum_size=2048)
     register_exception_handlers(app)
-    app.include_router(api_router)
+    app.include_router(api_router, prefix=settings.api_v1_prefix)
+
+    @app.get("/health", tags=["Health"])
+    async def health() -> dict[str, str]:
+        return {"status": "ok", "version": settings.app_version}
+
     return app
 
 
-app = create_application()
+app = create_app()

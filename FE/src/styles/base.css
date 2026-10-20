@@ -1,0 +1,181 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--bg);
+  background-image: var(--bg-accent);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+h1 {
+  font-size: 28px;
+  font-weight: 800;
+}
+h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+h3 {
+  font-size: 15px;
+  font-weight: 650;
+}
+h4 {
+  font-size: 14px;
+  font-weight: 650;
+}
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--primary-soft);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.muted {
+  color: var(--text-muted);
+}
+.text-danger {
+  color: var(--danger) !important;
+}
+.right {
+  display: flex;
+  justify-content: flex-end;
+}
+.spacer {
+  flex: 1;
+}
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.link {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 13px;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.link:hover {
+  text-decoration: underline;
+}
+.link.sm {
+  font-size: 12px;
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 860px) {
+  .desktop-only,
+  .hide-sm {
+    display: none !important;
+  }
+}
+@media (min-width: 861px) {
+  .mobile-only {
+    display: none !important;
+  }
+}
